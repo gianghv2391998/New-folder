@@ -7,6 +7,7 @@ function App() {
   const [posts, setPosts] = useState([]) // Danh sách bài viết
   const [views, setViews] = useState('') // Số lượt xem
   const [title, setTitle] = useState('') // Tiêu đề
+  const [image, setImage] = useState('') // Ảnh
   const [currentEdit, setCurrentEdit] = useState({}) // Bài viết đang chỉnh sửa
 
   // Hàm lấy danh sách bài viết từ server
@@ -22,8 +23,6 @@ function App() {
   // Hàm thêm bài viết mới
   const addPost = async () => {
     try {
-      //[1,2,3]
-      //Math.max(...[1,2,3]) = Math.max(1,2,3)
       // Tìm ID lớn nhất hiện tại
       const maxId = posts.length > 0 ? Math.max(...posts.map(post => post.id)) : 0
       // Tạo ID mới bằng cách tăng ID lớn nhất lên 1
@@ -32,7 +31,8 @@ function App() {
       const formData = {
         id: newId, // Gán ID mới
         views: views,
-        title: title
+        title: title,
+        image: image // Thêm thuộc tính image vào formData
       }
       // Gửi request POST lên server
       await axios.post('http://localhost:3000/posts', formData)
@@ -40,6 +40,7 @@ function App() {
       getPosts()
       setTitle('')
       setViews('')
+      setImage('')
     } catch (error) {
       console.error(error)
     }
@@ -91,6 +92,8 @@ function App() {
       <input type="number" placeholder='Enter Views' value={views} onChange={(e) => setViews(e.target.value)} />
       {/* Input để nhập tiêu đề */}
       <input type="text" placeholder='Enter Title' value={title} onChange={(e) => setTitle(e.target.value)} />
+      {/* Input để nhập link ảnh */}
+      <input type="text" placeholder='Enter Image URL' value={image} onChange={(e) => setImage(e.target.value)} />
       {/* Button để thêm bài viết mới */}
       <button onClick={addPost}>Add</button>
 
@@ -101,6 +104,7 @@ function App() {
             <th>id</th>
             <th>title</th>
             <th>views</th>
+            <th>img</th>
             <th>action</th>
           </tr>
         </thead>
@@ -132,6 +136,14 @@ function App() {
                           onChange={handleEditChange}
                         />
                       </td>
+                      <td>
+                        <input
+                          type="text"
+                          name="image"
+                          value={currentEdit.image}
+                          onChange={handleEditChange}
+                        />
+                      </td>
                     </>
                     :
                     // Nếu không, hiển thị thông tin bài viết
@@ -140,6 +152,7 @@ function App() {
                       <td>{post.id}</td>
                       <td>{post.title}</td>
                       <td>{post.views}</td>
+                      <td><img src={post.image} alt={post.title} width="100" /></td>
                     </>
                 }
                 {/* Button để xóa, chỉnh sửa và lưu bài viết */}
