@@ -36,8 +36,9 @@ function App() {
       }
       // Gửi request POST lên server
       await axios.post('http://localhost:3000/posts', formData)
-      // Lấy lại danh sách bài viết từ server
-      getPosts()
+      // Cập nhật danh sách bài viết ngay lập tức mà không cần gọi lại getPosts
+      setPosts(prevPosts => [...prevPosts, formData])
+      // Reset lại các input
       setTitle('')
       setViews('')
       setImage('')
@@ -51,8 +52,8 @@ function App() {
     try {
       // Gửi request PUT lên server để cập nhật bài viết
       await axios.put(`http://localhost:3000/posts/${formData.id}`, formData)
-      // Lấy lại danh sách bài viết sau khi cập nhật
-      getPosts()
+      // Cập nhật danh sách bài viết ngay lập tức mà không cần gọi lại getPosts
+      setPosts(prevPosts => prevPosts.map(post => post.id === formData.id ? formData : post))
       // Đặt lại state `currentEdit` để kết thúc chế độ chỉnh sửa
       setCurrentEdit({})
     } catch (error) {
@@ -65,8 +66,8 @@ function App() {
     try {
       // Gửi request DELETE lên server để xóa bài viết
       await axios.delete(`http://localhost:3000/posts/${id}`)
-      // Lấy lại danh sách bài viết từ server
-      getPosts()
+      // Cập nhật danh sách bài viết ngay lập tức mà không cần gọi lại getPosts
+      setPosts(prevPosts => prevPosts.filter(post => post.id !== id))
     } catch (error) {
       console.error(error)
     }
@@ -87,7 +88,6 @@ function App() {
   // Trả về JSX
   return (
     <>
-
       {/* Input để nhập số lượt xem */}
       <input type="number" placeholder='Enter Views' value={views} onChange={(e) => setViews(e.target.value)} />
       {/* Input để nhập tiêu đề */}
